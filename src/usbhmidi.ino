@@ -203,34 +203,57 @@ void loop()
   if (isMIDIReady && (MIDIOutTimer > 1000)) {
     ESP_LOGI("", "Sending MIDI SysEx message");
 
+    // Constructing the SysEx message to set Programmer mode
+    MIDIOut->num_bytes = 9; // Length of the SysEx message
+    uint8_t sysExMessage1[] = {
+    0xF0, // SysEx Start
+    0x00, // Manufacturer ID (Novation)
+    0x20, // Device ID (Launchpad X)
+    0x29, // 
+    0x02, // 
+    0x0C, // 
+    0x00, // Set layout command
+    0x7F, // Programmer mode layout
+    0xF7  // SysEx End
+    };
+
+    // Copy the SysEx message to the data buffer
+    memcpy(MIDIOut->data_buffer, sysExMessage1, 9);
+
+    // Submit the SysEx message for sending
+    esp_err_t err = usb_host_transfer_submit(MIDIOut);
+    if (err != ESP_OK) {
+    ESP_LOGI("", "usb_host_transfer_submit Out fail: %x", err);
+    }
+
     // Constructing the SysEx message
     MIDIOut->num_bytes = 18; // Length of the SysEx message
-    uint8_t sysExMessage[] = {
+    uint8_t sysExMessage2[] = {
       0xF0, // SysEx Start
       0x00, // Manufacturer ID (Novation)
       0x20, // Device ID (Launchpad X)
       0x29, // 
       0x02, // 
       0x0C, // 
-      0x03, // 
-      0x00, // static yellow
-      0x0B, // static yellow
+      0x03, // LED lighting SysEx message
+      0x00, // Lighting type 0: Static colour from palette
+      0x0B, // LED index: Bottom left first LED
       0x0D, // static yellow
-      0x01, // flashing green (between dim and bright green)
-      0x0C, // flashing green (between dim and bright green)
+      0x01, // Lighting type 1: Flashing colour
+      0x0C, // LED index: Bottom left second LED
       0x15, // flashing green (between dim and bright green)
       0x17, // flashing green (between dim and bright green)
-      0x02, // pulsing turquoise
-      0x0D, // pulsing turquoise
+      0x02, // Lighting type 2: Pulsing colour
+      0x0D, // LED index: Bottom left third LED
       0x25, // pulsing turquoise
       0xF7  // SysEx End
     };
 
     // Copy the SysEx message to the data buffer
-    memcpy(MIDIOut->data_buffer, sysExMessage, 18);
+    memcpy(MIDIOut->data_buffer, sysExMessage2, 18);
 
     // Submit the SysEx message for sending
-    esp_err_t err = usb_host_transfer_submit(MIDIOut);
+    err = usb_host_transfer_submit(MIDIOut);
     if (err != ESP_OK) {
       ESP_LOGI("", "usb_host_transfer_submit Out fail: %x", err);
     }
