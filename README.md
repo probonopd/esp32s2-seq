@@ -29,9 +29,11 @@ sudo -E python3 -m esptool --chip esp32s2 --port /dev/ttyU0 write_flash 0 ~/Down
 
 ## TODO
 
-* Get the Novation Launchpad X go into Programmer Mode (the light show should then end); why is it not working yet? Not sending to second MIDI interface?
-* Get it to blink some LEDs; why is it not working yet? Not sending to second MIDI interface?
+* Get the Novation Launchpad X go into Programmer Mode (the light show should then end); why is it not working yet? Not sending to second MIDI interface? Also see https://github.com/touchgadget/esp32-usb-host-demos/issues/11
+* Get it to blink some LEDs; why is it not working yet?
 * Forward MIDI coming from Novation Launchpad X on the first MIDI interface as Serial MIDI to the instrument, e.g, [MiniDexed](https://github.com/probonopd/MiniDexed/)
+* Maybe use https://github.com/TheKikGen/midiXparser
+* Implement step sequencer (possibly using existing Arduino code from an existing step sequencer?)
 
 ## Documentation
 
