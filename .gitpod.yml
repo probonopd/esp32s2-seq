@@ -1,0 +1,7 @@
+tasks:
+  - name: Install PlatformIO
+    command: pip3 install platformio
+  - name: Initial Project Setup
+    command: platformio init --board lolin_s2_mini
+  - name: Build Project
+    command: pio run

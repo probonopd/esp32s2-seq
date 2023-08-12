@@ -25,7 +25,7 @@
 #include "show_desc.hpp"
 #include "usbhhelp.hpp"
 
-//#define MIDIOUTTEST 1
+#define MIDIOUTTEST 1
 #if MIDIOUTTEST
 #include <elapsedMillis.h>
 elapsedMillis MIDIOutTimer;
@@ -201,13 +201,41 @@ void loop()
 
 #ifdef MIDIOUTTEST
   if (isMIDIReady && (MIDIOutTimer > 1000)) {
-    ESP_LOGI("", "MIDI send 4 bytes");
-    MIDIOut->num_bytes = 4;
-    memcpy(MIDIOut->data_buffer, "\x09\x90\x3c\x7a", 4);
-    err = usb_host_transfer_submit(MIDIOut);
+    ESP_LOGI("", "Sending MIDI SysEx message");
+
+    // Constructing the SysEx message
+    MIDIOut->num_bytes = 18; // Length of the SysEx message
+    uint8_t sysExMessage[] = {
+      0xF0, // SysEx Start
+      0x00, // Manufacturer ID (Novation)
+      0x20, // Device ID (Launchpad X)
+      0x29, // 
+      0x02, // 
+      0x0C, // 
+      0x03, // 
+      0x00, // static yellow
+      0x0B, // static yellow
+      0x0D, // static yellow
+      0x01, // flashing green (between dim and bright green)
+      0x0C, // flashing green (between dim and bright green)
+      0x15, // flashing green (between dim and bright green)
+      0x17, // flashing green (between dim and bright green)
+      0x02, // pulsing turquoise
+      0x0D, // pulsing turquoise
+      0x25, // pulsing turquoise
+      0xF7  // SysEx End
+    };
+
+    // Copy the SysEx message to the data buffer
+    memcpy(MIDIOut->data_buffer, sysExMessage, 18);
+
+    // Submit the SysEx message for sending
+    esp_err_t err = usb_host_transfer_submit(MIDIOut);
     if (err != ESP_OK) {
       ESP_LOGI("", "usb_host_transfer_submit Out fail: %x", err);
     }
+
+    // Reset the timer
     MIDIOutTimer = 0;
   }
 #endif
